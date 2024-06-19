@@ -1,0 +1,7 @@
+baseURL = 'https://example.org/'
+languageCode = 'en-us'
+title = 'Tec-Net S.A.'
+theme = 'ananke'
+publishDir = 'u2_tarea0/dist'
+
+
