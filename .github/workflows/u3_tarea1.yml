@@ -1,0 +1,38 @@
+name: u3_tarea1
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *'  # Ejecutar una vez al día a medianoche UTC
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup environment
+        shell: pwsh
+        run: |
+          # Instalar herramientas necesarias utilizando setup.ps1
+          Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+          .\setup.ps1
+
+      - name: Lint
+        run: |
+          shellcheck setup.ps1
+
+      - name: Build
+        run: make build
+
+      - name: Unit Tests
+        run: make unit-tests
+
+      - name: Validate
+        run: make validate
+
+      - name: Integration Tests
+        run: make integration-tests
