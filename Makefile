@@ -13,3 +13,7 @@ post: ## Crear una nueva entrada de blog
 help: ## Mostrar esta ayuda
 	@echo "Targets disponibles:"
 	@powershell -Command "Get-Content '$(MAKEFILE_LIST)' | Select-String -Pattern '^[a-zA-Z_-]+:.?## ' | ForEach-Object { \$$_.Line.Trim() -replace '^.## ', ' - ' }"
+
+package:
+    @echo "Packaging awesome-website..."
+    zip -r awesome-website.zip awesome-api dist/
