@@ -1,0 +1,6 @@
+template: |
+  ## Cambios en esta versión
+
+  {{#each pull_requests}}
+  - {{title}} ([#{{number}}]({{html_url}}))
+  {{/each}}
