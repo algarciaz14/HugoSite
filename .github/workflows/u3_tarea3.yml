@@ -1,0 +1,70 @@
+name: Build, Package, and Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  schedule:
+    - cron: '0 0 * * *'  # Ejecutar una vez al día a medianoche UTC
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up dependencies
+        run: pwsh ./setup.ps1
+
+      - name: Lint the code
+        run: make lint
+
+      - name: Build the project
+        run: make build
+
+      - name: Run unit tests
+        run: make unit-tests
+
+      - name: Validate the project
+        run: make validate
+
+      - name: Run integration tests
+        run: make integration-tests
+
+      - name: Package the application
+        run: make package
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: awesome-website
+          path: awesome-website.zip
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: ${{ steps.get_deploy_md.outputs.content }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./awesome-website.zip
+          asset_name: awesome-website.zip
+          asset_content_type: application/zip
+
+      - name: Get DEPLOY.md content
+        id: get_deploy_md
+        run: |
+          echo "::set-output name=content::$(cat DEPLOY.md)"
