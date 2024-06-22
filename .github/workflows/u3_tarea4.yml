@@ -1,0 +1,41 @@
+# .github/workflows/u3_tarea4.yml
+
+name: CI/CD with Pull Requests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Hugo and dependencies
+        run: |
+          ./setup.sh
+
+      - name: Lint
+        run: |
+          make lint
+
+      - name: Build
+        run: |
+          make build
+
+      - name: Unit Tests
+        run: |
+          make unit-tests
+
+      - name: Validate
+        run: |
+          make validate
+
+      - name: Integration Tests
+        run: |
+          make integration-tests
